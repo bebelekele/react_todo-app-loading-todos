@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable jsx-a11y/control-has-associated-label */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { UserWarning } from './UserWarning';
 import { USER_ID, getTodos } from './api/todos';
 import { Todo } from './types/Todo';
@@ -12,11 +12,7 @@ type SortTodos = 'All' | 'Active' | 'Completed';
 export const App: React.FC = () => {
   const [todosFromServer, setTodosFromServer] = useState<Todo[]>([]);
 
-  const [preparedTodos, setTodos] = useState<Todo[]>([]);
   const [error, setError] = useState<ErrorMessage>(null);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-
   const [sortTodos, setSortTodos] = useState<SortTodos>('All');
 
   function sorterTodos(todos: Todo[], sortStatus: SortTodos) {
@@ -36,14 +32,6 @@ export const App: React.FC = () => {
       .catch(() => setError('LOAD'))
       .finally();
   }, []);
-
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
-
-  useEffect(() => {
-    setTodos(sorterTodos(todosFromServer, sortTodos));
-  }, [sortTodos, todosFromServer]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -70,17 +58,18 @@ export const App: React.FC = () => {
           {/* Add a todo on form submit */}
           <form>
             <input
-              ref={inputRef}
+              // ref={inputRef}
               data-cy="NewTodoField"
               type="text"
               className="todoapp__new-todo"
               placeholder="What needs to be done?"
+              autoFocus
             />
           </form>
         </header>
 
         <section className="todoapp__main" data-cy="TodoList">
-          {preparedTodos.map(todo => {
+          {sorterTodos(todosFromServer, sortTodos).map(todo => {
             return (
               <div
                 data-cy="Todo"
